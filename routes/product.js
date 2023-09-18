@@ -4,7 +4,7 @@ const ctrls = require('../controllers/product')
 
 router.post('/', ctrls.createProduct)
 router.get('/', ctrls.getProducts)
-
+router.delete('/:pid', ctrls.deleteProduct)
 
 router.get('/:pid', ctrls.getProduct)
 

@@ -113,8 +113,20 @@ const getProducts = asyncHandler(async (req, res) => {
     
    
 })
+
+
+// Xóa sản phẩm
+const deleteProduct = asyncHandler(async (req, res) => {
+    const { pid } = req.params
+    const deletedProduct = await Product.findByIdAndDelete(pid)
+    return res.status(200).json({
+        success: deletedProduct ? 'Xóa sản phẩm thành công' : false,
+        deletedProduct: deletedProduct ? deletedProduct : 'KO xóa được sản phẩm'
+    })
+})
 module.exports = {
     createProduct,
     getProduct,
     getProducts,
+    deleteProduct
 }
