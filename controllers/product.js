@@ -114,6 +114,16 @@ const getProducts = asyncHandler(async (req, res) => {
    
 })
 
+// cập nhập sản phẩm
+const updateProduct = asyncHandler(async (req, res) => {
+    const { pid } = req.params
+    if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
+    const updatedProduct = await Product.findByIdAndUpdate(pid, req.body, { new: true })
+    return res.status(200).json({
+        success: updatedProduct ? 'Cập nhập sản phẩm thành công' : false,
+        updatedProduct: updatedProduct ? updatedProduct : 'KO cập nhập được sản phẩm'
+    })
+})
 
 // Xóa sản phẩm
 const deleteProduct = asyncHandler(async (req, res) => {
@@ -128,5 +138,6 @@ module.exports = {
     createProduct,
     getProduct,
     getProducts,
-    deleteProduct
+    deleteProduct,
+    updateProduct
 }
