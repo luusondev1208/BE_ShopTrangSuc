@@ -1,7 +1,6 @@
 const Category = require('../models/category')
 const asyncHandler = require('express-async-handler')
 
-
 const createdCategory = asyncHandler(async(req,res)=>{
     const response = await Category.create(req.body)
     return res.json({
@@ -11,11 +10,23 @@ const createdCategory = asyncHandler(async(req,res)=>{
 })
 
 
+
 const getAllCategory = asyncHandler(async(req,res)=>{
     const response = await Category.find().select('title _id')
     return res.json({
         success : response ? 'Hiển thị category thành công' : false,
         getAllCategory : response ? response : 'Ko hiển thị category được!!'
+    })
+})
+
+
+
+const updateCategory = asyncHandler(async(req,res)=>{
+    const {pcid} = req.params
+    const response = await Category.findByIdAndUpdate(pcid,req.body,{new:true})
+    return res.json({
+        success : response ? 'Cập nhập category thành công' : false,
+        updateCategory : response ? response : 'Ko cập nhập category được!!'
     })
 })
 
@@ -33,7 +44,7 @@ const deleteCategory = asyncHandler(async(req,res)=>{
 module.exports = {
     createdCategory,
     getAllCategory,
-
+    updateCategory,
     deleteCategory
 
 }
