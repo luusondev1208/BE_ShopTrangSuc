@@ -46,9 +46,9 @@ var productSchema = new mongoose.Schema({
         type: Array
     },
     // màu
-    color: {
+    size: {
         type: String,
-        enum: ['Black', 'Grown', 'Red']
+        enum: [6, 7, 8, 9, 10, 11]
     },
     //Xếp hàng
     ratings: [
