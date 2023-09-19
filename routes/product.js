@@ -1,12 +1,13 @@
 const router = require('express').Router()
 const ctrls = require('../controllers/product')
+const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken')
 
 
-router.post('/', ctrls.createProduct)
+router.post('/', [verifyAccessToken, isAdmin], ctrls.createProduct)
 router.get('/', ctrls.getProducts)
 router.get('/:pid', ctrls.getProduct)
-router.delete('/:pid', ctrls.deleteProduct)
-router.put('/:pid', ctrls.updateProduct)
+router.delete('/:pid', [verifyAccessToken, isAdmin],ctrls.deleteProduct)
+router.put('/:pid', [verifyAccessToken, isAdmin],ctrls.updateProduct)
 
 
 module.exports = router
