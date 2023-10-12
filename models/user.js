@@ -32,7 +32,7 @@ var userSchema = new mongoose.Schema({
     cart:[{
         product: {type : mongoose.Types.ObjectId, ref:'Product'},
         quantity:Number,
-        color:String,
+        size:String,
 
     }],
     address: {
