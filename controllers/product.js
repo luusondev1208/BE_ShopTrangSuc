@@ -134,10 +134,23 @@ const deleteProduct = asyncHandler(async (req, res) => {
         deletedProduct: deletedProduct ? deletedProduct : 'KO xóa được sản phẩm'
     })
 })
+// upload images
+const uploadImageProduct = asyncHandler(async(req,res)=>{
+   
+    const {pid} = req.params
+    if(!req.files)  throw new Error('Ko được bỏ trống')
+    const response = await Product.findByIdAndUpdate(pid,{$push: {images: {$each:req.files.map(el => el.path)}}}, {new:true})
+
+    return res.status(200).json({
+        status:response ? 'Thêm ảnh thành công' : false,
+        updateProduct : response ? response : 'Ko thêm được ảnh vào sản phẩm'
+    })
+})
 module.exports = {
     createProduct,
     getProduct,
     getProducts,
     deleteProduct,
-    updateProduct
+    updateProduct,
+    uploadImageProduct
 }
