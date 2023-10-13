@@ -57,11 +57,12 @@ const deleteBlog = asyncHandler(async(req,res)=>{
 
 
 
+
 // Thêm ảnh Blog
 const uploadImageBlog = asyncHandler(async(req,res)=>{
     const {bid} = req.params
     if(!req.file)  throw new Error('Ko được bỏ trống')
-    const response = await Blog.findByIdAndUpdate(bid,{$push: {images: req.file.path}}, {new:true})
+    const response = await Blog.findByIdAndUpdate(bid,{ image: req.file.path}, {new:true})
 
     return res.status(200).json({
         status:response ? 'Thêm ảnh thành công' : false,

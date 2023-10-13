@@ -34,7 +34,6 @@ var blogSchema = new mongoose.Schema({
     ],
     image :{
         type:String,
-        default: 'https://media.istockphoto.com/id/1130150680/photo/blog-and-information-website-concept-workplace-background-with-text.jpg?s=612x612&w=0&k=20&c=BtknpmORYmgMHN5Qty7N0o5mvsk204BG-q4oR8gFl_g='
     },
     //Tac gia bai viet
     author:{
