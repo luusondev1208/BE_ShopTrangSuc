@@ -6,6 +6,7 @@ const categoryRouter = require('./category')
 
 const productRouter = require('./product')
 const blogRouter = require('./blog')
+const brandRouter = require('./brand')
 
 
 const initRoutes = (app) => {
@@ -13,6 +14,7 @@ const initRoutes = (app) => {
     app.use('/api/category',categoryRouter),
     app.use('/api/product',productRouter)
     app.use('/api/blog',blogRouter)
+    app.use('/api/brand',brandRouter)
 
 
     app.use(notFound)
