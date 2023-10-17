@@ -7,7 +7,7 @@ const categoryRouter = require('./category')
 const productRouter = require('./product')
 const blogRouter = require('./blog')
 const brandRouter = require('./brand')
-
+const couponRouter = require('./coupon')
 
 const initRoutes = (app) => {
     app.use('/api/user',userRouter)
@@ -15,7 +15,7 @@ const initRoutes = (app) => {
     app.use('/api/product',productRouter)
     app.use('/api/blog',blogRouter)
     app.use('/api/brand',brandRouter)
-
+    app.use('/api/coupon',couponRouter)
 
     app.use(notFound)
     app.use(errHandler)
