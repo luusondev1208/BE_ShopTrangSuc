@@ -11,4 +11,7 @@ router.put('/:pid', [verifyAccessToken, isAdmin],ctrls.updateProduct)
 
 router.put('/upload/:pid', [verifyAccessToken, isAdmin],uploadImage.array('images',10), ctrls.uploadImageProduct)
 
+
+router.put('/ratings',verifyAccessToken, ctrls.ratings)
+
 module.exports = router

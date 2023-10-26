@@ -146,11 +146,56 @@ const uploadImageProduct = asyncHandler(async(req,res)=>{
         updateProduct : response ? response : 'Ko thêm được ảnh vào sản phẩm'
     })
 })
+
+
+
+
+
+
+
+//
+const ratings = asyncHandler( async(req,res)=>{
+    const {_id} = req.user
+    const {star,comment,pid} = req.body
+    if(!star || !pid) throw new Error('KO dc bo trong')
+    const ratingProduct = await Product.findById(pid)
+    const alreadyRating = ratingProduct?.ratings?.find(el => el.postedBy.toString() === _id)
+    // console.log({alreadyRating});
+    if(alreadyRating){
+        //update star & coment
+        await Product.updateOne({
+            ratings: { $elemMatch: alreadyRating}
+        }, {
+            $set:{"ratings.$.star":star,"ratings.$.comment":comment}
+        },{new:true})
+
+    }else{
+        //add start %comment
+        await Product.findByIdAndUpdate(pid,{
+            $push:{ratings: {star,comment,postedBy:_id}}
+        },{new:true})
+       
+    }
+    // sum ratings
+
+    const updateProduct = await Product.findById(pid)
+    const ratingCount = updateProduct.ratings.length
+    const sumRatings = updateProduct.ratings.reduce((sum,el) => sum + +el.star,0)
+    updateProduct.totalRatings = Math.round(sumRatings * 10/ratingCount) / 10
+    await updateProduct.save()
+
+    return res.status(200).json({
+        status:true
+    })
+})
+
+
 module.exports = {
     createProduct,
     getProduct,
     getProducts,
     deleteProduct,
     updateProduct,
-    uploadImageProduct
+    uploadImageProduct,
+    ratings
 }
