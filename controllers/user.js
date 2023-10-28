@@ -152,7 +152,36 @@ const updateCart = asyncHandler(async (req, res) => {
 })
 
 
-
+// 
+const refreshAccessToken = asyncHandler(async (req, res) => {
+    // Lấy token từ cookies
+    const cookie = req.cookies
+    // Check xem có token hay không
+    if (!cookie && !cookie.refreshToken) throw new Error('Ko có mã thông báo làm mới trong cookie')
+    // Check token có hợp lệ hay không
+    const rs = await jwt.verify(cookie.refreshToken, process.env.JWT_SECRET)
+    const response = await User.findOne({ _id: rs._id, refreshToken: cookie.refreshToken })
+    return res.status(200).json({
+        success: response ? true : false,
+        newAccessToken: response ? generateAccessToken(response._id, response.role) : 'Làm mới mã thông báo ko khớp!'
+    })
+})
+// Đăng Xuất
+const logout = asyncHandler(async (req, res) => {
+    const cookie = req.cookies
+    if (!cookie || !cookie.refreshToken) throw new Error('KO có mã thông báo làm mới trong cookie')
+    // Xóa refresh token ở db
+    await User.findOneAndUpdate({ refreshToken: cookie.refreshToken }, { refreshToken: '' }, { new: true })
+    // Xóa refresh token ở cookie trình duyệt
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true
+    })
+    return res.status(200).json({
+        success: true,
+        mes: 'Đăng xuất thành công !'
+    })
+})
 module.exports = {
     register,
     login,
@@ -163,5 +192,7 @@ module.exports = {
     updateUserByAdmin,
     updateCart,
     updateUserAddress,
+    refreshAccessToken,
+    logout
     
 }
