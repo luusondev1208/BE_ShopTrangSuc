@@ -17,6 +17,7 @@ router.post('/refreshtoken', ctrls.refreshAccessToken)
 
 router.put('/:uid', [verifyAccessToken, isAdmin], ctrls.updateUserByAdmin)
 router.get('/logout', ctrls.logout)
+router.get('/forgotpassword', ctrls.forgotPassword)
 
 
 
