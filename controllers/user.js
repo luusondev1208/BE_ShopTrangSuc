@@ -3,6 +3,7 @@ const asyncHandler = require('express-async-handler') // yarn add express-async-
 const { generateAccessToken, generateRefreshToken } = require('../middlewares/jwt')
 const jwt = require('jsonwebtoken') 
 const crypto = require('crypto')
+const sendMail = require('../ultils/sendMail')
 
 // Đăng ký
 const register = asyncHandler(async (req, res) => {
@@ -182,6 +183,31 @@ const logout = asyncHandler(async (req, res) => {
         mes: 'Đăng xuất thành công !'
     })
 })
+
+
+const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.query
+    if (!email) throw new Error('Thiếu email')
+    const user = await User.findOne({ email })
+    if (!user) throw new Error('Ko tìm thấy người dùng')
+    const resetToken = user.createPasswordChangedToken()
+    await user.save()
+
+    const html = `Anh/chị đã yêu cầu đổi mật khẩu tại NROJewelry - Trang sức. <br> 
+
+    Anh/chị vui lòng truy cập vào liên kết dưới đây để thay đổi mật khẩu của Anh/chị nhé.. <br> <a href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}>Click here</a>`
+
+    const data = {
+        email,
+        html
+    }
+    const rs = await sendMail(data)
+    return res.status(200).json({
+        success: true,
+        rs
+    })
+})
+
 module.exports = {
     register,
     login,
@@ -193,6 +219,7 @@ module.exports = {
     updateCart,
     updateUserAddress,
     refreshAccessToken,
-    logout
+    logout,
+    forgotPassword
     
 }
