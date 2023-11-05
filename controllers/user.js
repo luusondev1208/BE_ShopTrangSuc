@@ -208,6 +208,24 @@ const forgotPassword = asyncHandler(async (req, res) => {
     })
 })
 
+
+// rest mật khẩu
+const resetPassword = asyncHandler(async (req, res) => {
+    const { password, token } = req.body
+    if (!password || !token) throw new Error('Ko được bỏ trống ')
+    const passwordResetToken = crypto.createHash('sha256').update(token).digest('hex')
+    const user = await User.findOne({ passwordResetToken, passwordResetExpires: { $gt: Date.now() } })
+    if (!user) throw new Error('Mã thông báo đặt lại ko hợp lệ')
+    user.password = password
+    user.passwordResetToken = undefined
+    user.passwordChangedAt = Date.now()
+    user.passwordResetExpires = undefined
+    await user.save()
+    return res.status(200).json({
+        success: user ? true : false,
+        mes: user ? 'Cập nhật mật khẩu' : 'Đã xảy ra sự cố'
+    })
+})
 module.exports = {
     register,
     login,
@@ -220,6 +238,7 @@ module.exports = {
     updateUserAddress,
     refreshAccessToken,
     logout,
-    forgotPassword
+    forgotPassword,
+    resetPassword
     
 }
