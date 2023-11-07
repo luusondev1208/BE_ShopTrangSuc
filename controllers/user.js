@@ -226,6 +226,21 @@ const resetPassword = asyncHandler(async (req, res) => {
         mes: user ? 'Cập nhật mật khẩu' : 'Đã xảy ra sự cố'
     })
 })
+
+//get wishlist
+const getWishlist = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    try {
+        const findUser = await User.findById(_id).populate('wishlist');
+        res.json(findUser.wishlist);
+    } catch (err) {
+        throw new Error(err);
+    }
+});
+
+
+
+
 module.exports = {
     register,
     login,
@@ -239,6 +254,7 @@ module.exports = {
     refreshAccessToken,
     logout,
     forgotPassword,
-    resetPassword
+    resetPassword,
+    getWishlist,
     
 }
