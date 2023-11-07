@@ -54,7 +54,12 @@ var userSchema = new mongoose.Schema({
     },
     passwordResetExpires: {
         type: String
-    }
+    },
+    wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+        token: String,
+        refreshToken: {
+            type: String,
+        },
 }, {
     timestamps: true
 });
