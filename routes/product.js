@@ -3,6 +3,8 @@ const ctrls = require('../controllers/product')
 const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken')
 const uploadImage = require('../config/cloudinary.config')
 
+router.get('/filter', ctrls.getFilteredProducts);
+
 router.post('/', [verifyAccessToken, isAdmin], ctrls.createProduct)
 router.get('/', ctrls.getProducts)
 router.get('/:pid', ctrls.getProduct)

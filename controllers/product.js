@@ -113,7 +113,37 @@ const getProducts = asyncHandler(async (req, res) => {
     
    
 })
+const getFilteredProducts = async (req, res) => {
+    try {
+        const { title, minPrice, maxPrice } = req.query;
 
+        const filterConditions = {};
+
+        if (title) {
+            filterConditions.title = { $regex: title, $options: 'i' };
+        }
+
+        if (minPrice) {
+            filterConditions.price = { $gte: parseFloat(minPrice) };
+        }
+
+        if (maxPrice) {
+            filterConditions.price = {
+                ...filterConditions.price,
+                $lte: parseFloat(maxPrice),
+            };
+        }
+
+        const filteredProducts = await Product.find(filterConditions);
+
+        return res.status(200).json({
+            success: filteredProducts.length > 0,
+            productData: filteredProducts.length > 0 ? filteredProducts : 'Không có sản phẩm phù hợp',
+        });
+    } catch (err) {
+        return res.status(500).json({ success: false, error: err.message });
+    }
+};
 // cập nhập sản phẩm
 const updateProduct = asyncHandler(async (req, res) => {
     const { pid } = req.params
@@ -197,5 +227,6 @@ module.exports = {
     deleteProduct,
     updateProduct,
     uploadImageProduct,
-    ratings
+    ratings,
+    getFilteredProducts
 }
