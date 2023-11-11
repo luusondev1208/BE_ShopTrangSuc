@@ -57,12 +57,20 @@ const login = asyncHandler(async (req, res) => {
     }
 })
 // GET ra 1 người dùng
+// const getCurrent = asyncHandler(async (req, res) => {
+//     const { _id } = req.params
+//     const user = await User.findById(_id).select('-refreshToken -password -role')
+//     return res.status(200).json({
+//         success: user ? true : false,
+//         rs: user ? user : 'Ko tìm thấy người dùng'
+//     })
+// })
 const getCurrent = asyncHandler(async (req, res) => {
-    const { _id } = req.user
-    const user = await User.findById(_id).select('-refreshToken -password -role')
+    const { uid } = req.params
+    const user = await User.findById(uid)
     return res.status(200).json({
-        success: user ? true : false,
-        rs: user ? user : 'Ko tìm thấy người dùng'
+        success: user ? 'Hiển thị người dùng' : false,
+        use: user ? user : 'Ko tìm thấy người dùng'
     })
 })
 
