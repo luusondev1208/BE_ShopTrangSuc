@@ -203,7 +203,9 @@ const forgotPassword = asyncHandler(async (req, res) => {
 
     const html = `Anh/chị đã yêu cầu đổi mật khẩu tại NROJewelry - Trang sức. <br> 
 
-    Anh/chị vui lòng truy cập vào liên kết dưới đây để thay đổi mật khẩu của Anh/chị nhé.. <br> <a href=${process.env.URL_SERVER}/api/user/reset-password/${resetToken}>Click here</a>`
+    Anh/chị vui lòng truy cập vào liên kết dưới đây để thay đổi mật khẩu của Anh/chị nhé.. <br> 
+    Đây là mã thay đổi mật khẩu :
+    ${resetToken}`
 
     const data = {
         email,
