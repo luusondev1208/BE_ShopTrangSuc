@@ -32,8 +32,8 @@ var blogSchema = new mongoose.Schema({
             ref:'User'
         }
     ],
-    image :{
-        type:String,
+    images :{
+        type: Array,
     },
     //Tac gia bai viet
     author:{

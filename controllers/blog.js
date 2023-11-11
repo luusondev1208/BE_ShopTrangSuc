@@ -60,15 +60,26 @@ const deleteBlog = asyncHandler(async(req,res)=>{
 // Thêm ảnh Blog
 const uploadImageBlog = asyncHandler(async(req,res)=>{
     const {bid} = req.params
-    if(!req.file)  throw new Error('Ko được bỏ trống')
-    const response = await Blog.findByIdAndUpdate(bid,{ image: req.file.path}, {new:true})
+    if(!req.files)  throw new Error('Ko được bỏ trống')
+    const response = await Blog.findByIdAndUpdate(bid,{$push: {images: {$each:req.files.map(el => el.path)}}}, {new:true})
 
     return res.status(200).json({
         status:response ? 'Thêm ảnh thành công' : false,
         updateBlog : response ? response : 'Ko thêm được ảnh vào Blog'
     })})
 
-
+    const uploadImageProduct = asyncHandler(async(req,res)=>{
+   
+        const {pid} = req.params
+        if(!req.files)  throw new Error('Ko được bỏ trống')
+        const response = await Product.findByIdAndUpdate(pid,{$push: {images: {$each:req.files.map(el => el.path)}}}, {new:true})
+    
+        return res.status(200).json({
+            status:response ? 'Thêm ảnh thành công' : false,
+            updateProduct : response ? response : 'Ko thêm được ảnh vào sản phẩm'
+        })
+    })
+    
 
     
 const likeBlog = asyncHandler (async(req,res)=>{

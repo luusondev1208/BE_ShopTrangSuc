@@ -9,7 +9,7 @@ router.put('/update/:bid', [verifyAccessToken, isAdmin], ctrls.updateBlog)
 router.get('/',  ctrls.getBlogs)
 router.get('/one/:bid',  ctrls.getBlog)
 router.delete('/:bid', [verifyAccessToken, isAdmin], ctrls.deleteBlog)
-router.put('/image/:bid', [verifyAccessToken,isAdmin],upload.single('image'), ctrls.uploadImageBlog)
+router.put('/image/:bid', [verifyAccessToken,isAdmin],upload.array('images',10), ctrls.uploadImageBlog)
 router.put('/likes/:bid', [verifyAccessToken], ctrls.likeBlog)
 router.put('/dislike/:bid', [verifyAccessToken], ctrls.dislikeBlog)
 
