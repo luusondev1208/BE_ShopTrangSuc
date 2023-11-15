@@ -248,7 +248,85 @@ const getWishlist = asyncHandler(async (req, res) => {
     }
 });
 
+const addCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { pid, quantity, size } = req.body;
 
+    if (!pid || !quantity || !size) {
+        throw new Error('Fields cannot be empty!');
+    }
+
+    const user = await User.findById(_id).select('cart');
+    const alreadyProduct = user?.cart?.find(el => el.product.toString() === pid);
+
+    let response;
+
+    if (alreadyProduct) {
+        // Product with the same ID already exists in the cart
+        if (alreadyProduct.size === size) {
+            // Update quantity if the size matches
+            response = await User.updateOne({ cart: { $elemMatch: alreadyProduct } }, { $set: { "cart.$.quantity": quantity } }, { new: true });
+        } else {
+            // Add a new product with a different size
+            response = await User.findByIdAndUpdate(_id, { $push: { cart: { product: pid, quantity, size } } }, { new: true });
+        }
+    } else {
+        // Product does not exist in the cart, add a new one
+        response = await User.findByIdAndUpdate(_id, { $push: { cart: { product: pid, quantity, size } } }, { new: true });
+    }
+
+    if (!response) {
+        throw new Error('Something went wrong');
+    }
+
+    res.status(200).json({
+        success: true,
+        updatedUser: response,
+    });
+});
+
+const deleteCart = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { cartId } = req.body;
+
+    if (!cartId) {
+        return res.status(400).json({ success: false, error: 'Cart ID is required.' });
+    }
+
+    try {
+        const user = await User.findById(_id).select('cart');
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found.' });
+        }
+
+        // Find the index of the cart item to be removed
+        const cartIndex = user.cart.findIndex(cartItem => cartItem._id.toString() === cartId);
+
+        if (cartIndex === -1) {
+            return res.status(404).json({ success: false, error: 'Cart item not found.' });
+        }
+
+        // Remove the cart item using splice
+        user.cart.splice(cartIndex, 1);
+
+        // Save the updated user
+        await user.save();
+
+        // Recalculate total amount for the entire cart
+        const updatedUser = await User.findById(_id).select('cart');
+        const totalAmount = updatedUser?.cart?.reduce((sum, item) => sum + item.total, 0) || 0;
+
+        return res.status(200).json({
+            success: true,
+            message: 'Mục giỏ hàng đã được xóa thành công',
+            totalAmount: totalAmount,
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, error: 'Internal Server Error' });
+    }
+});
 
 
 module.exports = {
@@ -266,5 +344,6 @@ module.exports = {
     forgotPassword,
     resetPassword,
     getWishlist,
-    
+    addCart,
+    deleteCart,
 }
