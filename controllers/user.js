@@ -38,9 +38,9 @@ const login = asyncHandler(async (req, res) => {
     const response = await User.findOne({ email })
     if (response && await response.isCorrectPassword(password)) {
         // Tách password và role ra khỏi response
-        const { password, role, refreshToken, ...userData } = response.toObject()
+        const { password, refreshToken, ...userData } = response.toObject()
         // Tạo access token
-        const accessToken = generateAccessToken(response._id, role)
+        const accessToken = generateAccessToken(response._id)
         // Tạo refresh token
         const newRefreshToken = generateRefreshToken(response._id)
         // Lưu refresh token vào database
@@ -78,7 +78,7 @@ const getCurrent = asyncHandler(async (req, res) => {
 
 // Hiển thị tài khoản người dùng
 const getUsers = asyncHandler(async (req, res) => {
-    const response = await User.find().select('-refreshToken -password ')
+    const response = await User.find()
     return res.status(200).json({
         success: response ? true : false,
         users: response
