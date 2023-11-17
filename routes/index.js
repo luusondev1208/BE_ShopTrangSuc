@@ -21,6 +21,15 @@ const initRoutes = (app) => {
 
     app.use(notFound)
     app.use(errHandler)
+
+    app.get('/api/images', async (req, res) => {
+        try {
+          const images = await Image.find();
+          res.json(images);
+        } catch (error) {
+          res.status(500).json({ error: 'lỗi k thấy ảnh' });
+        }
+      });
 }
 
 module.exports = initRoutes
