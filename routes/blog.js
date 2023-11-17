@@ -4,7 +4,7 @@ const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken')
 const upload = require('../config/cloudinary.config')
 
 
-router.post('/', [verifyAccessToken, isAdmin], ctrls.createdBlog)
+router.post('/add', [verifyAccessToken, isAdmin], ctrls.createdBlog)
 router.put('/update/:bid', [verifyAccessToken, isAdmin], ctrls.updateBlog)
 router.get('/',  ctrls.getBlogs)
 router.get('/one/:bid',  ctrls.getBlog)
