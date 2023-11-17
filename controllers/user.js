@@ -4,6 +4,7 @@ const { generateAccessToken, generateRefreshToken } = require('../middlewares/jw
 const jwt = require('jsonwebtoken') 
 const crypto = require('crypto')
 const sendMail = require('../ultils/sendMail')
+const bcrypt = require('bcrypt');
 
 // Đăng ký
 const register = asyncHandler(async (req, res) => {
@@ -98,14 +99,23 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 // Cập nhập Người dùng
 const updateUser = asyncHandler(async (req, res) => {
-    const { _id } = req.body
-    if (!_id || Object.keys(req.body).length === 0) throw new Error('Missing inputs')
-    const response = await User.findByIdAndUpdate(_id, req.body, { new: true }).select('-password -role -refreshToken')
+    const { _id, password } = req.body;
+  
+    if (!_id || Object.keys(req.body).length === 0) {
+      throw new Error('Missing inputs');
+    }
+  
+    if (password) {
+      req.body.password = await bcrypt.hash(password, 10);
+    }
+  
+    const response = await User.findByIdAndUpdate(_id, req.body, { new: true }).select('-password -role -refreshToken');
+  
     return res.status(200).json({
-        success: response ? true : false,
-        updatedUser: response ? response : 'Some thing went wrong'
-    })
-})
+      success: !!response,
+      updatedUser: response ? response : 'Something went wrong',
+    });
+  });
 
 
 // Cập nhập Admin
