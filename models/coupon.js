@@ -2,23 +2,45 @@ const mongoose = require('mongoose'); // Erase if already required
 
 // Declare the Schema of the Mongo model
 var couponSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        required:true,
-        unique:true,
-        uppercase:true
+    name: {
+        type: String,
+        required: true,
     },
-    discount:{
-        type:Number,
-        required:true,
+    code: {
+        type: String,
+        required: true,
     },
-    exipiry:{
-        type:Date,
-        required:true,
+    discountPrice: {
+        type: Number,
+        required: false
     },
-   
+    fromPrice: {
+        type: Number,
+        required: false
+    },
+    type: {
+        type: String,
+        required: true,
+    },
+    limit: {
+        type: Number,
+        required: true,
+    },
+    startDate: {
+        type: String,
+        required: true,
+    },
+    endDate: {
+        type: String,
+        required: true,
+    },
+    status: {
+        type: String,
+        enum: ["active", "expired"],
+        default: "active",
+    },
 },
-    {timestamps:true}
+    { timestamps: true }
 );
 
 //Export the model

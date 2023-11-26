@@ -48,7 +48,7 @@ var productSchema = new mongoose.Schema({
     // màu
     size: {
         type: String,
-        enum: ['39', '40', '41','42']
+        enum: ['39', '40', '41', '42']
     },
     //Xếp hàng
     ratings: [

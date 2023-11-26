@@ -1,9 +1,10 @@
 const User = require('../models/user')
 const asyncHandler = require('express-async-handler') // yarn add express-async-handler 
 const { generateAccessToken, generateRefreshToken } = require('../middlewares/jwt')
-const jwt = require('jsonwebtoken') 
+const jwt = require('jsonwebtoken')
 const crypto = require('crypto')
 const sendMail = require('../ultils/sendMail')
+const bcrypt = require('bcrypt');
 
 // Đăng ký
 const register = asyncHandler(async (req, res) => {
@@ -28,34 +29,37 @@ const register = asyncHandler(async (req, res) => {
 // Access token => Xác thực người dùng, quân quyên người dùng
 // Đăng Nhập
 const login = asyncHandler(async (req, res) => {
-    const { email, password } = req.body
-    if (!email || !password)
+    const { email, password } = req.body;
+    if (!email || !password) {
         return res.status(400).json({
-            sucess: false,
-            mes: 'Ko được bỏ trống'
-        })
-    // plain object
-    const response = await User.findOne({ email })
-    if (response && await response.isCorrectPassword(password)) {
-        // Tách password và role ra khỏi response
-        const { password, refreshToken, ...userData } = response.toObject()
-        // Tạo access token
-        const accessToken = generateAccessToken(response._id)
-        // Tạo refresh token
-        const newRefreshToken = generateRefreshToken(response._id)
-        // Lưu refresh token vào database
-        await User.findByIdAndUpdate(response._id, { refreshToken: newRefreshToken }, { new: true })
-        // Lưu refresh token vào cookie
-        res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 })
-        return res.status(200).json({
-            sucess: true,
-            accessToken,
-            userData
-        })
-    } else {
-        throw new Error('Thông tin ko hợp lệ!')
+            success: false,
+            mes: 'Ko được bỏ trống',
+        });
     }
-})
+
+    const response = await User.findOne({ email });
+
+    if (response && (await response.isCorrectPassword(password))) {
+
+        const { password: _, ...userData } = response.toObject();
+
+        const accessToken = generateAccessToken(response._id, response.role);
+        const newRefreshToken = generateRefreshToken(response._id);
+
+        await User.findByIdAndUpdate(response._id, { refreshToken: newRefreshToken }, { new: true });
+
+        res.cookie('refreshToken', newRefreshToken, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
+
+        return res.status(200).json({
+            success: true,
+            accessToken,
+            userData,
+        });
+    } else {
+        throw new Error('Thông tin không hợp lệ!');
+    }
+});
+
 // GET ra 1 người dùng
 // const getCurrent = asyncHandler(async (req, res) => {
 //     const { _id } = req.params
@@ -98,14 +102,23 @@ const deleteUser = asyncHandler(async (req, res) => {
 
 // Cập nhập Người dùng
 const updateUser = asyncHandler(async (req, res) => {
-    const { _id } = req.user
-    if (!_id || Object.keys(req.body).length === 0) throw new Error('Missing inputs')
-    const response = await User.findByIdAndUpdate(_id, req.body, { new: true }).select('-password -role -refreshToken')
+    const { _id, password } = req.body;
+
+    if (!_id || Object.keys(req.body).length === 0) {
+        throw new Error('Missing inputs');
+    }
+
+    if (password) {
+        req.body.password = await bcrypt.hash(password, 10);
+    }
+
+    const response = await User.findByIdAndUpdate(_id, req.body, { new: true }).select('-password -role -refreshToken');
+
     return res.status(200).json({
-        success: response ? true : false,
-        updatedUser: response ? response : 'Some thing went wrong'
-    })
-})
+        success: !!response,
+        updatedUser: response ? response : 'Something went wrong',
+    });
+});
 
 
 // Cập nhập Admin
@@ -123,7 +136,7 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
 const updateUserAddress = asyncHandler(async (req, res) => {
     const { _id } = req.user
     if (!req.body.address) throw new Error('Ko duoc bo trong')
-    const response = await User.findByIdAndUpdate(_id, { $push: {address: req.body.address }}, { new: true }).select('-password -role -refreshToken')
+    const response = await User.findByIdAndUpdate(_id, { $push: { address: req.body.address } }, { new: true }).select('-password -role -refreshToken')
     return res.status(200).json({
         success: response ? true : false,
         updatedUser: response ? response : 'Some thing went wrong'
@@ -132,32 +145,32 @@ const updateUserAddress = asyncHandler(async (req, res) => {
 
 const updateCart = asyncHandler(async (req, res) => {
     const { _id } = req.user
-    const {pid , quantity, size} = req.body
+    const { pid, quantity, size } = req.body
     if (!pid || !quantity || !size) throw new Error('Ko được để trống !')
     const user = await User.findById(_id).select('cart')
     const alreadyProduct = user?.cart?.find(el => el.product.toString() === pid)
     if (alreadyProduct) {
-        if(alreadyProduct.size === size){
-            const response = await User.updateOne({cart: { $elemMatch:alreadyProduct }}, { $set: {"cart.$.quantity":quantity}}, {new:true})
+        if (alreadyProduct.size === size) {
+            const response = await User.updateOne({ cart: { $elemMatch: alreadyProduct } }, { $set: { "cart.$.quantity": quantity } }, { new: true })
             return res.status(200).json({
                 success: response ? true : false,
                 updatedUser: response ? response : 'Some thing went wrong'
             })
-        }else{
-            const response = await User.findByIdAndUpdate(_id, {$push: {cart: {product: pid, quantity, size}}}, { new: true })
+        } else {
+            const response = await User.findByIdAndUpdate(_id, { $push: { cart: { product: pid, quantity, size } } }, { new: true })
             return res.status(200).json({
                 success: response ? true : false,
                 updatedUser: response ? response : 'Some thing went wrong'
             })
         }
     } else {
-        const response = await User.findByIdAndUpdate(_id, {$push: {cart: {product: pid, quantity, size}}}, { new: true })
+        const response = await User.findByIdAndUpdate(_id, { $push: { cart: { product: pid, quantity, size } } }, { new: true })
         return res.status(200).json({
             success: response ? true : false,
             updatedUser: response ? response : 'Some thing went wrong'
         })
     }
-   
+
 })
 
 

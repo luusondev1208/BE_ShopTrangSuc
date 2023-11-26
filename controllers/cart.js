@@ -71,7 +71,7 @@ const updateCart = async (req, res) => {
   const productId = req.body.productId;
   const quantity = req.body.quantity;
   const userId = req.body.userId;
- 
+
   try {
 
     const user = await userModel.findById(userId);
@@ -177,7 +177,7 @@ const removeProduct = async (req, res) => {
   const idCart = req.params.id
 
   try {
-console.log(productId);
+    console.log(productId);
     // const user = await userModel.findById(userId);
     // if (!user) {
     //   return res.status(404).json({ error: 'Người dùng không tồn tại.' });
