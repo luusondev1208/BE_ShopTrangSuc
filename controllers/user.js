@@ -120,20 +120,38 @@ const updateUser = asyncHandler(async (req, res) => {
     });
   });
 
+
 //Update Password
 const updatePassword = asyncHandler(async (req, res) => {
-    const { _id } = req.user;
-    const { password } = req.body;
-    console.log(_id)
-    const user = await User.findById(_id);
-    if (password) {
-        user.password = password;
-        const updatePassword = await user.save();
-        res.json(updatePassword);
-    } else {
-        res.json(user);
+    try {
+        const { _id } = req.user;
+        const { oldPassword, newPassword } = req.body;
+
+        const user = await User.findById(_id);
+
+        if (!oldPassword) {
+            return res.status(400).json({ success: false, error: "Vui lòng nhập mật khẩu cũ." });
+        }
+
+        const isPasswordMatch = await user.isCorrectPassword(oldPassword);
+        if (!isPasswordMatch) {
+            return res.status(401).json({ success: false, error: "Mật khẩu cũ không đúng." });
+        }
+
+        if (newPassword) {
+            // Ensure that you're using a secure method to hash the new password, e.g., bcrypt
+            user.password = newPassword;
+            const updatedUser = await user.save();
+            return res.json({ success: true, user: updatedUser });
+        } else {
+            return res.json({ success: true, user });
+        }
+    } catch (error) {
+        console.error("Error updating password:", error);
+        return res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật mật khẩu." });
     }
 });
+
 
 // Cập nhập Admin
 const updateUserByAdmin = asyncHandler(async (req, res) => {
