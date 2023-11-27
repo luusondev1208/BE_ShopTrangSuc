@@ -120,6 +120,20 @@ const updateUser = asyncHandler(async (req, res) => {
     });
   });
 
+//Update Password
+const updatePassword = asyncHandler(async (req, res) => {
+    const { _id } = req.user;
+    const { password } = req.body;
+    console.log(_id)
+    const user = await User.findById(_id);
+    if (password) {
+        user.password = password;
+        const updatePassword = await user.save();
+        res.json(updatePassword);
+    } else {
+        res.json(user);
+    }
+});
 
 // Cập nhập Admin
 const updateUserByAdmin = asyncHandler(async (req, res) => {
@@ -359,4 +373,5 @@ module.exports = {
     getWishlist,
     addCart,
     deleteCart,
+    updatePassword
 }
