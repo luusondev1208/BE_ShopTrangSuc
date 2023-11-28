@@ -4,11 +4,11 @@ const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken')
 
 
 
-router.post('/', [verifyAccessToken, isAdmin],ctrls.createdCategory)
+router.post('/add', [verifyAccessToken, isAdmin],ctrls.createdCategory)
 router.get('/',  ctrls.getAllCategory)
 router.put('/:pcid',[verifyAccessToken, isAdmin], ctrls.updateCategory)
 router.delete('/:pcid', [verifyAccessToken, isAdmin],ctrls.deleteCategory)
-
+router.get('/:pcid',  ctrls.getCategory)
 
 
 module.exports = router

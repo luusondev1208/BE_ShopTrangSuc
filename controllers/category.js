@@ -8,7 +8,14 @@ const createdCategory = asyncHandler(async(req,res)=>{
         createdCategory : response ? response : 'Ko thêm category được!!'
     })
 })
-
+const getCategory = asyncHandler(async (req, res) => {
+    const { pcid } = req.params
+    const category = await Category.findById(pcid)
+    return res.status(200).json({
+        success: category ? 'Hiển thị sản phẩm thành công' : false,
+        categoryData: category ? category : 'KO có sản phẩm'
+    })
+})
 
 
 const getAllCategory = asyncHandler(async(req,res)=>{
@@ -45,6 +52,6 @@ module.exports = {
     createdCategory,
     getAllCategory,
     updateCategory,
-    deleteCategory
-
+    deleteCategory,
+    getCategory
 }

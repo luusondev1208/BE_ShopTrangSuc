@@ -5,7 +5,7 @@ const uploadImage = require('../config/cloudinary.config')
 
 router.get('/filter', ctrls.getFilteredProducts);
 
-router.post('/', [verifyAccessToken, isAdmin], ctrls.createProduct)
+router.post('/add', [verifyAccessToken, isAdmin], ctrls.createProduct)
 router.get('/', ctrls.getProducts)
 router.get('/:pid', ctrls.getProduct)
 router.delete('/:pid', [verifyAccessToken, isAdmin],ctrls.deleteProduct)
