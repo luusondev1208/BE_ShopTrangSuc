@@ -78,8 +78,6 @@ const getCurrent = asyncHandler(async (req, res) => {
     })
 })
 
-
-
 // Hiển thị tài khoản người dùng
 const getUsers = asyncHandler(async (req, res) => {
     const response = await User.find()
@@ -131,6 +129,36 @@ const updateUserByAdmin = asyncHandler(async (req, res) => {
         updatedUser: response ? response : 'Some thing went wrong'
     })
 })
+//Update Password
+const updatePassword = asyncHandler(async (req, res) => {
+    try {
+        const { _id } = req.user;
+        const { oldPassword, newPassword } = req.body;
+
+        const user = await User.findById(_id);
+        
+        if (!oldPassword) {
+            return res.status(400).json({ success: false, error: "Vui lòng nhập mật khẩu cũ." });
+        }
+
+        const isPasswordMatch = await user.isCorrectPassword(oldPassword);
+        if (!isPasswordMatch) {
+            return res.status(401).json({ success: false, error: "Mật khẩu cũ không đúng." });
+        }
+
+        if (newPassword) {
+            // Ensure that you're using a secure method to hash the new password, e.g., bcrypt
+            user.password = newPassword;
+            const updatedUser = await user.save();
+            return res.json({ success: true, user: updatedUser });
+        } else {
+            return res.json({ success: true, user });
+        }
+    } catch (error) {
+        console.error("Error updating password:", error);
+        return res.status(500).json({ success: false, error: "Đã xảy ra lỗi khi cập nhật mật khẩu." });
+    }
+});
 
 // Cập nhập địa chỉ User
 const updateUserAddress = asyncHandler(async (req, res) => {
@@ -359,4 +387,5 @@ module.exports = {
     getWishlist,
     addCart,
     deleteCart,
+    updatePassword
 }

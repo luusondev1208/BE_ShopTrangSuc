@@ -18,7 +18,7 @@ router.put('/address', [verifyAccessToken], ctrls.updateUserAddress)
 router.put('/cart', [verifyAccessToken], ctrls.updateCart)
 router.put('/:uid', [verifyAccessToken, isAdmin], ctrls.updateUserByAdmin)
 router.get('/wishlist', [verifyAccessToken], ctrls.getWishlist);
-
+router.put('/current/password', [verifyAccessToken], ctrls.updatePassword)
 router.post('/cart', verifyAccessToken, ctrls.addCart);
 router.delete('/cart', verifyAccessToken, ctrls.deleteCart);
 
