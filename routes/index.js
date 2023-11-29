@@ -10,8 +10,10 @@ const blogRouter = require('./blog')
 const brandRouter = require('./brand')
 const blogCategoryRouter = require('./blogCategory')
 const cartRouter = require('./cart');
+const ggRouter = require('./google');
 
 const initRoutes = (app) => {
+    
     app.use('/api/user', userRouter)
     app.use('/api/category', categoryRouter),
         app.use('/api/product', productRouter)
@@ -21,6 +23,7 @@ const initRoutes = (app) => {
     app.use('/order', orderRouter)
     app.use('/api/cart', cartRouter);
     app.use('/api/coupon', couponRouter);
+    app.use('/api/google', ggRouter);
     app.use(notFound)
     app.use(errHandler)
 }
