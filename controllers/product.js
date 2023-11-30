@@ -2,12 +2,10 @@ const e = require('express')
 const Product = require('../models/product')
 const asyncHandler = require('express-async-handler')
 const slugify = require('slugify') //npm i slugify
-
+const Category = require('../models/category')
 // Thêm sản phẩm
 const createProduct = asyncHandler(async (req, res) => {
     const fileData = req.files;
-    console.log(fileData);
-
     if (!fileData || fileData.length === 0) {
         return res.status(400).json({
             error: 'Vui lòng tải lên ít nhất một hình ảnh sản phẩm',
@@ -20,15 +18,28 @@ const createProduct = asyncHandler(async (req, res) => {
         });
     }
 
+    if (!req.body.category) {
+        return res.status(400).json({
+            error: 'Vui lòng cung cấp categoryId cho sản phẩm',
+        });
+    }
+  
     if (req.body.title) {
         req.body.slug = slugify(req.body.title);
     }
-
+    console.log(req.body.category)
     const imagePaths = fileData.map(file => file.path);
 
     const newProduct = await Product.create({
         ...req.body,
         images: imagePaths, // Sử dụng mảng đường dẫn đến các tệp
+    });
+
+    // Thêm sản phẩm vào danh mục
+    await Category.findByIdAndUpdate(newProduct.category, {
+        $addToSet: {
+            products: newProduct._id,
+        },
     });
 
     return res.status(200).json({

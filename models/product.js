@@ -32,7 +32,7 @@ var productSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'Category'
     },
-    //số lượng
+    //số lượng  
     quantity: {
         type: Number,
         default: 0
