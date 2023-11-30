@@ -124,8 +124,8 @@ const updateUser = asyncHandler(async (req, res) => {
 //Update Password
 const updatePassword = asyncHandler(async (req, res) => {
     try {
-        const { _id } = req.user;
-        const { oldPassword, newPassword } = req.body;
+        // const { _id } = req.user;
+        const { oldPassword, newPassword, id } = req.body;
 
         const user = await User.findById(_id);
 

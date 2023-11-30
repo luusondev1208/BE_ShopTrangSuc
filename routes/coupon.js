@@ -5,9 +5,9 @@ const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken')
 
 
 router.post('/add', [verifyAccessToken, isAdmin], ctrls.createdCoupon)
-router.get('/',  ctrls.getCoupons)
-router.put('/:cid', [verifyAccessToken, isAdmin], ctrls.updateCoupon)
-router.delete('/:cid', [verifyAccessToken, isAdmin], ctrls.deleteCoupon)
+router.post('/', ctrls.getCoupons)
+router.get('/getCouponByDiscount', ctrls.getCouponByDiscount)
+// router.delete('/:cid', [verifyAccessToken, isAdmin], ctrls.deleteCoupon)
 
 
 
