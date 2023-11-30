@@ -5,14 +5,38 @@ const slugify = require('slugify') //npm i slugify
 
 // Thêm sản phẩm
 const createProduct = asyncHandler(async (req, res) => {
-    if (Object.keys(req.body).length === 0) throw new Error('Ko được bỏ trống')
-    if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
-    const newProduct = await Product.create(req.body)
+    const fileData = req.files;
+    console.log(fileData);
+
+    if (!fileData || fileData.length === 0) {
+        return res.status(400).json({
+            error: 'Vui lòng tải lên ít nhất một hình ảnh sản phẩm',
+        });
+    }
+
+    if (Object.keys(req.body).length === 0) {
+        return res.status(400).json({
+            error: 'Dữ liệu không được để trống',
+        });
+    }
+
+    if (req.body.title) {
+        req.body.slug = slugify(req.body.title);
+    }
+
+    const imagePaths = fileData.map(file => file.path);
+
+    const newProduct = await Product.create({
+        ...req.body,
+        images: imagePaths, // Sử dụng mảng đường dẫn đến các tệp
+    });
+
     return res.status(200).json({
         success: newProduct ? 'Thêm sản phẩm thành công' : false,
-        createdProduct: newProduct ? newProduct : 'KO thêm được sản phẩm mới'
-    })
-})
+        createdProduct: newProduct ? newProduct : 'Không thêm được sản phẩm mới',
+    });
+});
+
 // Hiển thị 1 sản phẩm
 const getProduct = asyncHandler(async (req, res) => {
     const { pid } = req.params
