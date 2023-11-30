@@ -10,8 +10,7 @@ router.post('/add', uploadCloudinary.array('image', 5) , [verifyAccessToken, isA
 router.get('/', ctrls.getProducts)
 router.get('/:pid', ctrls.getProduct)
 router.delete('/:pid', [verifyAccessToken, isAdmin],ctrls.deleteProduct)
-router.put('/:pid', [verifyAccessToken, isAdmin],ctrls.updateProduct)
-
+router.put('/:pid', uploadCloudinary.array('image', 5), [verifyAccessToken, isAdmin], ctrls.updateProduct);
 
 
 router.put('/ratings',verifyAccessToken, ctrls.ratings)

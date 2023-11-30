@@ -170,15 +170,46 @@ const getFilteredProducts = async (req, res) => {
 };
 // cập nhập sản phẩm
 const updateProduct = asyncHandler(async (req, res) => {
-    const { pid } = req.params
-    if (req.body && req.body.title) req.body.slug = slugify(req.body.title)
-    const updatedProduct = await Product.findByIdAndUpdate(pid, req.body, { new: true })
-    return res.status(200).json({
-        success: updatedProduct ? 'Cập nhập sản phẩm thành công' : false,
-        updatedProduct: updatedProduct ? updatedProduct : 'KO cập nhập được sản phẩm'
-    })
-})
-
+    const { pid } = req.params;
+    const fileData = req.files;
+    console.log(fileData);
+    try {
+      let updatedFields = req.body;
+  
+      // Nếu có tựa đề mới, cập nhật slug
+      if (req.body.title) {
+        updatedFields.slug = slugify(req.body.title);
+      }
+  
+      // Nếu có hình ảnh mới, thêm vào mảng images
+      if (req.files && req.files.image) {
+        // Lưu ý: Điều này giả sử bạn sử dụng middleware để xử lý file (ví dụ: multer)
+        updatedFields.images.push(req.files.image[0].filename);
+      }
+  
+      const updatedProduct = await Product.findByIdAndUpdate(pid, updatedFields, { new: true });
+  
+      if (!updatedProduct) {
+        return res.status(404).json({
+          success: false,
+          message: 'Không tìm thấy sản phẩm để cập nhật',
+        });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: 'Cập nhật sản phẩm thành công',
+        updatedProduct,
+      });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: 'Lỗi khi cập nhật sản phẩm',
+        error: error.message,
+      });
+    }
+  });
 // Xóa sản phẩm
 const deleteProduct = asyncHandler(async (req, res) => {
     const { pid } = req.params
@@ -188,21 +219,6 @@ const deleteProduct = asyncHandler(async (req, res) => {
         deletedProduct: deletedProduct ? deletedProduct : 'KO xóa được sản phẩm'
     })
 })
-// upload images
-const uploadImageProduct = asyncHandler(async(req,res)=>{
-   
-    const {pid} = req.params
-    if(!req.files)  throw new Error('Ko được bỏ trống')
-    const response = await Product.findByIdAndUpdate(pid,{$push: {images: {$each:req.files.map(el => el.path)}}}, {new:true})
-
-    return res.status(200).json({
-        status:response ? 'Thêm ảnh thành công' : false,
-        updateProduct : response ? response : 'Ko thêm được ảnh vào sản phẩm'
-    })
-})
-
-
-
 
 
 
@@ -250,7 +266,7 @@ module.exports = {
     getProducts,
     deleteProduct,
     updateProduct,
-    uploadImageProduct,
+
     ratings,
     getFilteredProducts
 }
