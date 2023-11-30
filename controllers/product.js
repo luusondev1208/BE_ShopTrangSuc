@@ -183,44 +183,56 @@ const getFilteredProducts = async (req, res) => {
 const updateProduct = asyncHandler(async (req, res) => {
     const { pid } = req.params;
     const fileData = req.files;
-    console.log(fileData);
+    
     try {
-      let updatedFields = req.body;
-  
-      // Nếu có tựa đề mới, cập nhật slug
-      if (req.body.title) {
-        updatedFields.slug = slugify(req.body.title);
-      }
-  
-      // Nếu có hình ảnh mới, thêm vào mảng images
-      if (req.files && req.files.image) {
-        // Lưu ý: Điều này giả sử bạn sử dụng middleware để xử lý file (ví dụ: multer)
-        updatedFields.images.push(req.files.image[0].filename);
-      }
-  
-      const updatedProduct = await Product.findByIdAndUpdate(pid, updatedFields, { new: true });
-  
-      if (!updatedProduct) {
-        return res.status(404).json({
-          success: false,
-          message: 'Không tìm thấy sản phẩm để cập nhật',
+        let updatedFields = req.body;
+
+        // Nếu có tựa đề mới, cập nhật slug
+        if (req.body.title) {
+            updatedFields.slug = slugify(req.body.title);
+        }
+
+        // Nếu có hình ảnh mới, thêm vào mảng images
+        if (req.files && req.files.length > 0) {
+            // Lưu ý: Điều này giả sử bạn sử dụng middleware để xử lý file (ví dụ: multer)
+            const newImages = req.files.map(file => file.path);
+            updatedFields.images = [...newImages];
+            
+            // Xóa hình ảnh cũ trên Cloudinary
+            const oldProduct = await Product.findById(pid);
+            oldProduct.images.forEach(async (oldImage) => {
+                // Sử dụng Cloudinary API để xóa hình ảnh
+                // Cloudinary.v2.uploader.destroy(oldImage.public_id, (error, result) => {
+                //     if (error) console.log(error);
+                //     console.log(result);
+                // });
+            });
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(pid, updatedFields, { new: true });
+
+        if (!updatedProduct) {
+            return res.status(404).json({
+                success: false,
+                message: 'Không tìm thấy sản phẩm để cập nhật',
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: 'Cập nhật sản phẩm thành công',
+            updatedProduct,
         });
-      }
-  
-      return res.status(200).json({
-        success: true,
-        message: 'Cập nhật sản phẩm thành công',
-        updatedProduct,
-      });
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({
-        success: false,
-        message: 'Lỗi khi cập nhật sản phẩm',
-        error: error.message,
-      });
+        console.error(error);
+        return res.status(500).json({
+            success: false,
+            message: 'Lỗi khi cập nhật sản phẩm',
+            error: error.message,
+        });
     }
-  });
+});
+
 // Xóa sản phẩm
 const deleteProduct = asyncHandler(async (req, res) => {
     const { pid } = req.params
