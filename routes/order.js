@@ -4,7 +4,7 @@ const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken')
 
 router.post('/', [verifyAccessToken], ctrls.createOrder)
 router.put('/status/:oid', [verifyAccessToken, isAdmin], ctrls.updateStatus)
-router.get('/getUserOder', [verifyAccessToken], ctrls.getUserOrder)
+router.get('/getUserOder/:userId', [verifyAccessToken], ctrls.getUserOrder)
 router.get('/getAll', [verifyAccessToken, isAdmin], ctrls.getAllOrders)
 router.post('/create_payment_url', ctrls.createPaymentUrl)
 router.get('/vnpay_return', ctrls.vnpayReturn)

@@ -222,14 +222,29 @@ const updateStatus = asyncHandler(async (req, res) => {
 
 
 
-const getUserOrder = asyncHandler(async (req, res) => {
-    const { _id } = req.user
-    const response = await Order.find({ orderBy: _id })
-    return res.json({
-        success: response ? 'Thêm Order thành công' : false,
-        response: response ? response : 'Ko thêm Order được!!'
-    })
-})
+const getUserOrder = async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+        const orders = await Order.find({ user: userId }).populate("products.product");
+
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({
+                message: "Người dùng không có đơn hàng",
+            });
+        }
+
+        res.status(200).json({ orders });
+    } catch (err) {
+        console.error("Lỗi truy vấn:", err);
+
+        res.status(500).json({
+            message: "Đã xảy ra lỗi trong quá trình tìm đơn hàng.",
+            error: err.message,  // Thêm thông báo lỗi cụ thể
+        });
+    }
+};
+
 
 
 
