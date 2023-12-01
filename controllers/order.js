@@ -1,6 +1,7 @@
 const Order = require('../models/order')
 const Cart = require('../models/cart')
 const User = require('../models/user')
+const Product = require('../models/product')
 const Voucher = require('../models/coupon')
 const config = require('config');
 const moment = require('moment');
@@ -127,7 +128,7 @@ const createOrder = async (req, res) => {
     try {
         const user = await User.findById(req.body.user)
         const userCart = await Cart.findById(user.cart);
-
+        const productCart = await Product.findById(req.body.product)
         if (!userCart) {
             return res.status(404).json({
                 message: "Chưa có giỏ hàng",
@@ -141,11 +142,13 @@ const createOrder = async (req, res) => {
 
         const cartProducts = userCart.products;
         const userId = user._id;
+        const titleProduct = productCart.title;
         const orderData = {
             ...req.body,
             products: cartProducts,
             user: userId,
             status: orderStatus,
+            title: titleProduct,
         };
 
         const createdOrder = await Order.create(orderData);
