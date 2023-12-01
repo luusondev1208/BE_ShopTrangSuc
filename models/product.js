@@ -43,9 +43,9 @@ var productSchema = new mongoose.Schema({
         default: 0
     },
     // Đối với nhiều hình ảnh, sử dụng một mảng của chuỗi
-images: [{
-    type: String
-}],
+    images: [{
+        type: String
+    }],
 
     // màu
     size: {

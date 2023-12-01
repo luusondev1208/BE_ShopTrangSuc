@@ -1,7 +1,6 @@
 const Order = require('../models/order')
 const Cart = require('../models/cart')
 const User = require('../models/user')
-const Product = require('../models/product')
 const Voucher = require('../models/coupon')
 const config = require('config');
 const moment = require('moment');
@@ -128,7 +127,7 @@ const createOrder = async (req, res) => {
     try {
         const user = await User.findById(req.body.user)
         const userCart = await Cart.findById(user.cart);
-        const productCart = await Product.findById(req.body.product)
+
         if (!userCart) {
             return res.status(404).json({
                 message: "Chưa có giỏ hàng",
@@ -142,13 +141,11 @@ const createOrder = async (req, res) => {
 
         const cartProducts = userCart.products;
         const userId = user._id;
-        const titleProduct = productCart.title;
         const orderData = {
             ...req.body,
             products: cartProducts,
             user: userId,
             status: orderStatus,
-            title: titleProduct,
         };
 
         const createdOrder = await Order.create(orderData);
@@ -237,12 +234,33 @@ const getUserOrder = asyncHandler(async (req, res) => {
 
 
 const getAllOrders = asyncHandler(async (req, res) => {
-    const response = await Order.find()
+    const response = await Order.find().populate('products.product');
     return res.json({
         success: response ? 'Hien thi Order thành công' : false,
         response: response ? response : 'Ko thêm Order được!!'
     })
 })
+
+const getOrder = async (req, res) => {
+    try {
+        const data = await Order.findById(req.params.id).populate('products.product');
+
+        if (!data || !data.length === 0) {
+            return res.status(404).json({
+                message: "Không có thông tin",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Thông tin đơn hàng",
+            data,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Đã có lỗi xảy ra " + err.message,
+        });
+    }
+};
 
 module.exports = {
     createOrder,
@@ -251,5 +269,6 @@ module.exports = {
     getAllOrders,
     createPaymentUrl,
     vnpayReturn,
-    changeStatusPayment
+    changeStatusPayment,
+    getOrder
 }

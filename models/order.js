@@ -25,10 +25,6 @@ var orderSchema = new mongoose.Schema({
             },
         },
     ],
-    title: {
-        type: String,
-        required: true,
-    },
     totalPrice: {
         type: Number,
         required: true,
