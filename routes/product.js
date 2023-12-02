@@ -2,16 +2,15 @@ const router = require('express').Router()
 const ctrls = require('../controllers/product')
 const { verifyAccessToken, isAdmin } = require('../middlewares/verifyToken')
 const uploadImage = require('../config/cloudinary.config')
+const uploadCloudinary = require('../config/cloudinary.config')
 
 router.get('/filter', ctrls.getFilteredProducts);
 
-router.post('/add', [verifyAccessToken, isAdmin], ctrls.createProduct)
+router.post('/add', uploadCloudinary.array('image', 5) , [verifyAccessToken, isAdmin], ctrls.createProduct)
 router.get('/', ctrls.getProducts)
 router.get('/:pid', ctrls.getProduct)
 router.delete('/:pid', [verifyAccessToken, isAdmin],ctrls.deleteProduct)
-router.put('/:pid', [verifyAccessToken, isAdmin],ctrls.updateProduct)
-
-router.put('/upload/:pid', [verifyAccessToken, isAdmin],uploadImage.array('images',10), ctrls.uploadImageProduct)
+router.put('/:pid', uploadCloudinary.array('image', 5), [verifyAccessToken, isAdmin], ctrls.updateProduct);
 
 
 router.put('/ratings',verifyAccessToken, ctrls.ratings)

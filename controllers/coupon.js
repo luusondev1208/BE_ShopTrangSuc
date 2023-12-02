@@ -1,60 +1,102 @@
-const Coupon = require('../models/coupon')
+const Voucher = require('../models/coupon')
+const User = require('../models/user')
 const asyncHandler = require('express-async-handler')
 
+const createdCoupon = asyncHandler(async (req, res) => {
+    try {
+        const checkVoucher = await Voucher.findOne({ code: req.body.code });
+        if (checkVoucher) {
+            return res.status(404).json({
+                message: "Mã code đã tồn tại",
+            });
+        }
 
+        const data = await Voucher.create(req.body);
 
-const createdCoupon = asyncHandler(async(req,res)=>{
-    const { name, discount,exipiry} = req.body
-    if(!name || !discount || !exipiry) throw new Error("Ko dc bo trong")
-    const response = await Coupon.create({
-        ...req.body,
-        exipiry: Date.now() + + exipiry*24*60*60*1000
-    })
-    return res.json({
-        success : response ? 'Thêm Coupon thành công' : false,
-        createdCoupon : response ? response : 'Ko thêm Coupon được!!'
-    })
+        if (!data) {
+            return res.status(404).json({
+                message: "Thêm voucher thất bại",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Thêm voucher thành công",
+            data: data,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server: " + error.message,
+        });
+    }
 })
 
+const getCoupons = asyncHandler(async (req, res) => {
+    try {
+        const data = await Voucher.findOne({ code: req.body.code });
 
+        if (!data) {
+            return res.status(404).json({
+                message: "Voucher không tồn tại",
+            });
+        }
 
+        const user = await User.findOne({ coupon: data._id });
+        if (user) {
+            return res.status(400).json({
+                message: "Bạn đã sử dụng voucher này",
+            });
+        }
 
-const getCoupons = asyncHandler(async(req,res)=>{
-    const response = await Coupon.find().select('-createAt -updateAt')
-    return res.json({
-        success : response ? 'Thêm Coupon thành công' : false,
-        getCoupons : response ? response : 'Ko thêm Coupon được!!'
-    })
+        if (data.limit === 0) {
+            return res.status(404).json({
+                message: "Voucher đã hết lượt sử dụng",
+            });
+        }
+
+        return res.status(200).json({
+            message: "Thông tin voucher",
+            data: data,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Lỗi server: " + error.message,
+        });
+    }
 })
 
+const getCouponByDiscount = asyncHandler(async (req, res) => {
+    try {
+        const data = await Voucher.find({ type: "discount" });
 
+        if (!data || data.length === 0) {
+            return res.status(404).json({
+                message: "Không có dữ liệu",
+            });
+        }
 
-
-const updateCoupon = asyncHandler(async(req,res)=>{
-    const { cid} = req.params
-    if(Object.keys(req.body).length === 0) throw new Error('Ko dc bo trong')
-    if(req.body.exipiry) req.body.exipiry = Date.now() + + req.body.exipiry*24*60*60*1000
-    const response = await Coupon.findByIdAndUpdate(cid,req.body,{new:true})
-    return res.json({
-        success : response ? 'Cap nhap Coupon thành công' : false,
-        updateCoupon : response ? response : 'Ko thêm Coupon được!!'
-    })
+        return res.status(200).json({
+            message: "Thông tin các voucher",
+            data,
+        });
+    } catch (err) {
+        return res.status(500).json({
+            message: "Đã có lỗi xảy ra",
+        });
+    }
 })
 
+// const deleteCoupon = asyncHandler(async (req, res) => {
+//     const { cid } = req.params
+//     const response = await Coupon.findByIdAndDelete(cid)
+//     return res.json({
+//         success: response ? 'Xoa Coupon thành công' : false,
+//         deleteCoupon: response ? response : 'Ko xoa Coupon được!!'
+//     })
+// })
 
-
-
-const deleteCoupon = asyncHandler(async(req,res)=>{
-    const { cid} = req.params
-    const response = await Coupon.findByIdAndDelete(cid)
-    return res.json({
-        success : response ? 'Xoa Coupon thành công' : false,
-        deleteCoupon : response ? response : 'Ko xoa Coupon được!!'
-    })
-})
 module.exports = {
     createdCoupon,
     getCoupons,
-    updateCoupon,
-    deleteCoupon
+    getCouponByDiscount,
+    // deleteCoupon
 }

@@ -29,11 +29,19 @@ var userSchema = new mongoose.Schema({
         type: String,
         default: 'user',
     },
-    cart:[{
-        product: {type : mongoose.Types.ObjectId, ref:'Product'},
-        quantity:Number,
-        size:String,
-
+    cart: {
+        type: mongoose.Types.ObjectId,
+        ref: "Cart",
+    },
+    coupon: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "Coupon",
+        },
+    ],
+    orders: [{
+        type: mongoose.Types.ObjectId,
+        ref: "Order",
     }],
     address: {
         type: String,
@@ -56,10 +64,10 @@ var userSchema = new mongoose.Schema({
         type: String
     },
     wishlist: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
-        token: String,
-        refreshToken: {
-            type: String,
-        },
+    token: String,
+    refreshToken: {
+        type: String,
+    },
 }, {
     timestamps: true
 });

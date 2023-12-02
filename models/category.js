@@ -8,6 +8,16 @@ var categorySchema = new mongoose.Schema({
         unique:true,
         index:true,
     },
+    isDelete: {
+        type: Boolean,
+        default: false
+      },
+    products: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: "Product",
+      },
+    ],
    
 },
     {timestamps:true}

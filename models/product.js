@@ -32,7 +32,7 @@ var productSchema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
         ref: 'Category'
     },
-    //số lượng
+    //số lượng  
     quantity: {
         type: Number,
         default: 0
@@ -42,13 +42,15 @@ var productSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    images: {
-        type: Array
-    },
+    // Đối với nhiều hình ảnh, sử dụng một mảng của chuỗi
+    images: [{
+        type: String
+    }],
+
     // màu
     size: {
         type: String,
-        enum: ['39', '40', '41','42']
+        enum: ['39', '40', '41', '42']
     },
     //Xếp hàng
     ratings: [
