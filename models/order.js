@@ -25,6 +25,16 @@ var orderSchema = new mongoose.Schema({
             },
         },
     ],
+    address: {
+        type: String,
+        default: "",
+        require: true
+    },
+    mobile: {
+        type: String,
+
+        unique: true,
+    },
     totalPrice: {
         type: Number,
         required: true,
@@ -41,10 +51,6 @@ var orderSchema = new mongoose.Schema({
     coupon: {
         type: mongoose.Types.ObjectId,
         ref: 'Coupon'
-    },
-    totalPrice: {
-        type: Number,
-        required: true,
     },
     status: {
         type: String,

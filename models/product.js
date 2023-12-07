@@ -28,6 +28,9 @@ var productSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+    priceroot: {
+        type: Number,
+    },
     category: {
         type: mongoose.Types.ObjectId,
         ref: 'Category'
@@ -35,7 +38,7 @@ var productSchema = new mongoose.Schema({
     //số lượng  
     quantity: {
         type: Number,
-        default: 0
+        default: 200
     },
     // đã bán
     sold: {
@@ -58,6 +61,13 @@ var productSchema = new mongoose.Schema({
             star: { type: Number },
             postedBy: { type: mongoose.Types.ObjectId, ref: 'User' },
             comment: { type: String }
+        }
+    ],
+    feedbacks: [
+        {
+            type: mongoose.Types.ObjectId,
+            ref: "Feedback",
+            autopopulate: true,
         }
     ],
     //Tổng số xếp hạng
